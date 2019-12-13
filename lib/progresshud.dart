@@ -178,7 +178,7 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
                     child: Text(
                     _text, 
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 16)
+                    style: TextStyle(color: Colors.white, fontSize: 16, decoration: TextDecoration.none,)
                   ),
                   )
                   
