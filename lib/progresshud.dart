@@ -20,13 +20,13 @@ class ProgressHud extends StatefulWidget {
   /// the offsetY of hudview postion from center, default is -50
   final double offsetY;
   final Widget child;
-  
+
   static ProgressHudState of(BuildContext context) {
     return context.ancestorStateOfType(const TypeMatcher<ProgressHudState>());
   }
-  
+
   ProgressHud({ @required this.child, this.offsetY = -50, Key key })
-    : super(key: key);
+      : super(key: key);
 
   @override
   ProgressHudState createState() => ProgressHudState();
@@ -35,7 +35,7 @@ class ProgressHud extends StatefulWidget {
 
 class ProgressHudState extends State<ProgressHud> with SingleTickerProviderStateMixin {
   AnimationController _animation;
-  
+
   var _isVisible = false;
   var _text = "";
   var _opacity = 0.0;
@@ -45,8 +45,8 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
   @override
   void initState() {
     _animation = AnimationController(
-      duration: const Duration(milliseconds: 200), 
-      vsync: this
+        duration: const Duration(milliseconds: 200),
+        vsync: this
     )..addListener(() {
       setState(() {
         _opacity = _animation.value;
@@ -54,26 +54,35 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
     })..addStatusListener((status) {
       if (status == AnimationStatus.dismissed) {
         setState(() {
-          _isVisible = false;          
+          _isVisible = false;
         });
       }
     });
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _animation.dispose();
+    _animation = null;
+    super.dispose();
+  }
+
   /// dismiss hud
   void dismiss() {
-    _animation.reverse();
+    _animation?.reverse();
   }
 
   /// show hud with type and text
   void show(ProgressHudType type, String text) {
-    _animation.forward();
-    setState(() {
-      _isVisible = true;
-      _text = text;
-      _progressType = type;
-    });
+    if (_animation != null) {
+      _animation.forward();
+      setState(() {
+        _isVisible = true;
+        _text = text;
+        _progressType = type;
+      });
+    }
   }
 
   /// show loading with text
@@ -81,8 +90,18 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
     this.show(ProgressHudType.loading, text);
   }
 
+  /// show success icon with text and dismiss automatic
+  Future showSuccessAndDismiss({String text}) async {
+    await this.showAndDismiss(ProgressHudType.success, text);
+  }
+
+  /// show error icon with text and dismiss automatic
+  Future showErrorAndDismiss({String text}) async {
+    await this.showAndDismiss(ProgressHudType.error, text);
+  }
+
   /// update progress value and text when ProgressHudType = progress
-  /// 
+  ///
   /// should call `show(ProgressHudType.progress, "Loading")` before use
   void updateProgress(double progress, String text) {
     setState(() {
@@ -106,11 +125,11 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
       children: <Widget>[
         widget.child,
         Offstage(
-          offstage: !_isVisible,
-          child: Opacity(
-            opacity: _opacity,
-            child: _createHud(),
-          )
+            offstage: !_isVisible,
+            child: Opacity(
+              opacity: _opacity,
+              child: _createHud(),
+            )
         )
       ],
     );
@@ -121,9 +140,9 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
     switch (_progressType) {
       case ProgressHudType.loading:
         var sizeBox = SizedBox(
-          width: kIconSize, 
-          height: kIconSize, 
-          child: CupertinoActivityIndicator(animating: true, radius: 15)
+            width: kIconSize,
+            height: kIconSize,
+            child: CupertinoActivityIndicator(animating: true, radius: 15)
         );
         return _createHudView(sizeBox);
       case ProgressHudType.error:
@@ -152,19 +171,19 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
             width: double.infinity,
             height: double.infinity,
           ),
-        ),        
+        ),
         Center(
           child: Container(
             margin: EdgeInsets.fromLTRB(10, 10, 10, 10 - widget.offsetY * 2),
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 33, 33, 33), 
-              borderRadius: BorderRadius.circular(5)
+                color: Color.fromARGB(255, 33, 33, 33),
+                borderRadius: BorderRadius.circular(5)
             ),
             constraints: BoxConstraints(
-              minHeight: 130,
-              minWidth: 130
+                minHeight: 130,
+                minWidth: 130
             ),
-            
+
             child: Padding(
               padding: EdgeInsets.all(12),
               child: Column(
@@ -176,12 +195,12 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
                   ),
                   Container(
                     child: Text(
-                    _text, 
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 16, decoration: TextDecoration.none,)
-                  ),
+                        _text,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 16, decoration: TextDecoration.none,)
+                    ),
                   )
-                  
+
                 ],
               ),
             ),
