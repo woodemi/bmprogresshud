@@ -140,9 +140,15 @@ class ProgressHudState extends State<ProgressHud> with SingleTickerProviderState
     switch (_progressType) {
       case ProgressHudType.loading:
         var sizeBox = SizedBox(
-            width: kIconSize,
-            height: kIconSize,
-            child: CupertinoActivityIndicator(animating: true, radius: 15)
+          width: kIconSize,
+          height: kIconSize,
+          child: Theme(
+            data: ThemeData(
+              cupertinoOverrideTheme:
+              CupertinoThemeData(brightness: Brightness.dark),
+            ),
+            child: CupertinoActivityIndicator(animating: true, radius: 15),
+          ),
         );
         return _createHudView(sizeBox);
       case ProgressHudType.error:
